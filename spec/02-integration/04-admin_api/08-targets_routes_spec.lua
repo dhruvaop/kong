@@ -13,7 +13,7 @@ local function it_content_types(title, fn)
 end
 
 local function client_send(req)
-  local client = helpers.admin_client()
+  local client = helpers.admin_client(0)
   local res = assert(client:send(req))
   local status, body = res.status, res:read_body()
   client:close()
