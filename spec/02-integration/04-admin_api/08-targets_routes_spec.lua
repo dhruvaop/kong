@@ -12,11 +12,18 @@ local function it_content_types(title, fn)
   it(title .. " with application/json", test_json)
 end
 
+local tout
 local function client_send(req)
+  local t = os.clock()
+  if tout then print("t_: ", (t - tout) * 1000) end
   local client = helpers.admin_client(0)
+  print("t1: ", (os.clock()-t) * 1000)
   local res = assert(client:send(req))
+  print("t2: ", (os.clock()-t) * 1000)
   local status, body = res.status, res:read_body()
   client:close()
+  print("t3: ", (os.clock()-t) * 1000)
+  tout = os.clock()
   return status, body
 end
 
@@ -407,6 +414,11 @@ describe("Admin API #" .. strategy, function()
         })
         assert.same(201, status)
         upstream = assert(cjson.decode(body))
+        local tx = os.clock()
+        if tout then
+          print ("passed: ", (tx - tout) * 1000, "        (resetting)")
+        end
+        tout = tx
       end)
 
       describe("with healthchecks off", function()
